@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2F5F48"></polygon>
+    </marker>
+  </defs>
+  
+  <!-- Path: straight down, right, down -->
+  <path d="M50 10 
+           V100 
+           H200 
+           V180" fill="none" stroke="#2F5F48" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#arrowhead)"></path>
+</svg>

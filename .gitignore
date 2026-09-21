@@ -1,0 +1,10 @@
+# Local project documents containing personal information
+Dataset links.txt
+Documentation.pdf
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+

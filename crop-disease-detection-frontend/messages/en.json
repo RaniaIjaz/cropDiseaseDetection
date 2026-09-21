@@ -1,0 +1,349 @@
+{
+  "navbar": {
+    "navItems": [
+      { "href": "/", "label": "Home" },
+      { "href": "/disease-detection", "label": "Disease Detection" },
+      { "href": "/about", "label": "About" }
+    ],
+    "userDropdown": {
+      "history": "History",
+      "logout": "Logout"
+    },
+    "authButton": "Sign Up / Login",
+    "mobileMenu": {
+      "logout": "Logout"
+    },
+    "language": {
+      "label": "Language",
+      "english": "English",
+      "urdu": "Urdu"
+    }
+  },
+  "home": {
+    "heroSlides": [
+      {
+        "image": "/assets/mainn.png",
+        "title": "AI-Powered Wheat & Cotton Disease Detection",
+        "description": "Upload crop images, detect diseases instantly, and get recommended solutions.",
+        "buttonText": "Try Detection",
+        "buttonLink": "/disease-detection"
+      },
+      {
+        "image": "/assets/new.jpeg",
+        "title": "Boost Crop Health with AI Insights",
+        "description": "Empowering farmers with AI-driven insights for sustainable farming.",
+        "buttonText": "Learn More",
+        "buttonLink": "/about"
+      },
+      {
+        "image": "/assets/flow.png",
+        "title": "Precision Agriculture Made Easy",
+        "description": "Identify diseases early and take the right actions for maximum yield.",
+        "buttonText": "Get Started",
+        "buttonLink": "/disease-detection"
+      },
+      {
+        "image": "/assets/main3.png",
+        "title": "Smart Farming for a Smarter Future",
+        "description": "Revolutionizing agriculture through artificial intelligence and innovation.",
+        "buttonText": "Explore More",
+        "buttonLink": "/"
+      }
+    ],
+    "works": {
+      "title": "How It Works",
+      "step1": {
+        "stepNumber": "Step 1",
+        "heading": "Upload Picture",
+        "description": "Upload a clear photo of a wheat or cotton leaf (good lighting, close-up of the affected area). High-quality images yield more accurate results. Avoid blurry shots and try capturing different angles."
+      },
+      "step2": {
+        "stepNumber": "Step 2",
+        "heading": "AI-Powered Disease Detection",
+        "description": "Our AI analyzes the uploaded image, compares it with trained samples, and instantly identifies the disease. It highlights patterns like discoloration, fungal spots, and texture variations with high accuracy."
+      },
+      "step3": {
+        "stepNumber": "Step 3",
+        "heading": "Personalized Recommendations",
+        "description": "Receive actionable treatment and prevention tips including chemical, organic, and cultural practices to protect your crops and boost long-term harvest health."
+      }
+    },
+    "about": {
+      "title": "Our Mission",
+      "heading": "Empowering farmers with AI-driven disease detection to protect crops and boost productivity.",
+      "description": "We aim to revolutionize farming by empowering farmers with AI-driven disease detection for wheat and cotton. Our goal is to help farmers protect crops, reduce losses, and increase productivity with smart, accessible technology.",
+      "buttonText": "Get To Know More About Us"
+    },
+    "features": {
+      "title": "Features",
+      "items": [
+        {
+          "title": "Fast & Accurate",
+          "description": "AI detection in seconds with high precision.",
+          "icon": "⚡"
+        },
+        {
+          "title": "Crop Support",
+          "description": "Specialized for Wheat & Cotton farmers.",
+          "icon": "🌾"
+        },
+        {
+          "title": "Solution Suggestions",
+          "description": "Actionable tips to cure and prevent diseases.",
+          "icon": "💡"
+        },
+        {
+          "title": "Web Based",
+          "description": "Access from anywhere, on any device.",
+          "icon": "🌍"
+        }
+      ]
+    }    
+  },
+    "aboutPage": {
+    "hero": {
+      "title": "Empowering Farmers with AI 🌾",
+      "subtitle": "Combining Artificial Intelligence with Agriculture to protect crops, increase yield, and ensure food security."
+    },
+    "mission": {
+      "title": "Our Mission",
+      "description": "Our mission is to empower farmers through AI technology — enabling them to detect crop diseases in wheat and cotton with just one image. We aim to minimize crop loss, improve productivity, and support sustainable farming practices."
+    },
+    "whatWeDo": {
+      "title": "What We Do",
+      "description": "Our AI system analyzes uploaded crop leaf images to detect diseases like *Wheat Leaf Rust* or *Cotton Curl Virus* in seconds. It then recommends scientifically proven treatments and preventive steps. The goal: help farmers make quick, informed decisions with just one click."
+    },
+    "problems": {
+      "title": "Problems Farmers Face",
+      "items": [
+        {
+          "title": "Late Disease Detection",
+          "description": "Farmers often realize disease symptoms when it's too late, causing irreversible damage."
+        },
+        {
+          "title": "Lack of Expert Guidance",
+          "description": "Most rural farmers lack direct access to agronomists or agricultural experts."
+        },
+        {
+          "title": "High Pesticide Cost",
+          "description": "Overuse of chemicals increases expenses and harms soil quality long-term."
+        },
+        {
+          "title": "Low Yield Efficiency",
+          "description": "Diseases and pest attacks can drastically reduce harvest productivity."
+        },
+        {
+          "title": "Climate-Driven Challenges",
+          "description": "Rising temperatures and humidity create ideal conditions for crop diseases."
+        },
+        {
+          "title": "Unawareness of AI Tools",
+          "description": "Many farmers remain unaware of how digital tools can help them monitor crop health."
+        }
+      ]
+    },
+    "vision": {
+      "title": "Our Vision for the Future",
+      "description": "We envision a world where every farmer — whether in remote villages or modern cities — can access AI tools to protect their crops and maximize yield. Our goal is to make agriculture smarter, greener, and more sustainable for generations to come."
+    }
+  },
+   "detectionPage": {
+    "title": "Disease Detection",
+    "subtitle": "Upload a crop leaf image for instant analysis",
+    "cropSelector": {
+      "wheat": "Wheat",
+      "cotton": "Cotton"
+    },
+    "uploadSection": {
+      "title": "Click to upload or drag and drop",
+      "subtitle": "Supports JPG, PNG (Max 10MB)",
+      "button": "Detect Disease"
+    },
+    "loading": {
+      "analyzing": "Analyzing...",
+      "message": "Analyzing your crop..."
+    },
+    "results": {
+      "detectedDisease": "Detected Disease",
+      "description": "Description",
+      "symptoms": "Symptoms",
+      "treatmentSolutions": "Treatment Solutions",
+      "treatmentSteps": "Treatment Steps",
+      "preventionMeasures": "Prevention Measures",
+      "preventiveGuidelines": "Preventive Guidelines",
+       "healthyStatus": "Healthy",
+      "noSymptoms": "No symptoms detected",
+      "noSolutions": "No treatment solutions available",
+      "noTreatmentSteps": "No treatment steps available",
+      "noPrevention": "No prevention measures available",
+      "noPreventiveGuidelines": "No preventive guidelines available",
+      "healthyCelebration": {
+        "title": "Great News!",
+        "message": "Your crop is perfectly healthy. Continue with your current farming practices!"
+      }
+    },
+    "alerts": {
+      "noImage": "Please upload an image first!",
+      "notLoggedIn": "User not logged in! Cannot predict disease.",
+      "error": "Error: {errorMessage}",
+      "invalidImage": "Invalid image! Please upload a {cropType} crop image.",
+      "validationFailed": "Image validation failed. Please upload an image containing {cropType} plant, leaves, or field."
+    }
+    
+  },
+   "historyPage": {
+    "title": "Detection History",
+    "welcomeMessage": "Welcome back,",
+    "subtitle": "View and analyze your previous plant disease detections",
+    "defaultUserName": "User",
+    "fetchError": "Failed to load detection history",
+    "showingFallback": "(Showing fallback data)",
+    "loading": "Loading your detection history...",
+    "noTreatmentSuggested": "No specific treatment suggested",
+    "notAvailable": "N/A",
+    "noDescription": "No description available",
+    
+    "stats": {
+      "totalDetections": "Total Detections",
+      "differentCrops": "Different Crops",
+      "diseasesDetected": "Diseases Detected"
+    },
+    
+    "filters": {
+      "title": "Filter Detections",
+      "searchPlaceholder": "Search disease...",
+      "allDiseases": "All Diseases"
+    },
+    
+    "summary": {
+      "filteredResults": "Filtered Results",
+      "active": "Active",
+      "outOf": "out of",
+      "totalDetections": "total detections",
+      "mostCommon": "Most Common",
+      "disease": "Disease",
+      "inFilteredResults": "In filtered results",
+      "mostRecent": "Most Recent",
+      "latest": "Latest",
+      "lastDetection": "Last detection date"
+    },
+    
+    "charts": {
+      "topDiseases": "Top Diseases",
+      "top10": "Top 10",
+      "timeline": "Detection Timeline",
+      "daily": "Daily",
+      "cropDistribution": "Crop Distribution",
+      "byDetectionCount": "By Detection Count",
+      "detections": "detections",
+      "count": "Count"
+    },
+    
+    "detections": {
+      "title": "Your Detections",
+      "showing": "Showing",
+      "of": "of",
+      "symptoms": "Symptoms",
+      "more": "more",
+      "recommendedAction": "Recommended Action",
+      "detectedOn": "Detected on",
+      "viewDetails": "View Details"
+    },
+    
+    "noDetections": {
+      "title": "No detections found",
+      "tryAdjusting": "Try adjusting your search or filter criteria",
+      "noDetectionsYet": "You haven't made any detections yet. Upload an image to get started!",
+      "startDetection": "Start Detection"
+    },
+    
+    "modal": {
+      "loading": "Loading detailed information...",
+      "loadError": "Could not load additional details",
+      "detectedOn": "Detected on",
+      "detectionDate": "Detection date",
+      "plantImage": "Plant Image",
+      "symptoms": "Symptoms",
+      "noSymptoms": "No symptoms information available",
+      "solutions": "Recommended Solutions",
+      "noSolutions": "No specific solutions recommended",
+      "prevention": "Prevention & Guidelines",
+      "noPrevention": "No prevention guidelines available",
+      "close": "Close",
+      "copyDetails": "Copy Details",
+      "printReport": "Print Report",
+      "disease": "Disease",
+      "crop": "Crop",
+      "description": "Description",
+      "copiedAlert": "Details copied to clipboard!"
+    },
+    
+    "crops": {
+      "wheat": "Wheat",
+      "cotton": "Cotton"
+    },
+    
+    "mockData": {
+      "wheatRust": {
+        "description": "Wheat Leaf Rust is a fungal disease caused by Puccinia triticina.",
+        "suggestion": "Apply Mancozeb fungicide and ensure proper irrigation.",
+        "symptoms": [
+          "Brown pustules",
+          "Yellow halos",
+          "Reduced photosynthesis",
+          "Premature leaf drop"
+        ],
+        "solutions": [
+          "Apply fungicide",
+          "Use resistant varieties",
+          "Practice crop rotation"
+        ],
+        "prevention": [
+          "Crop rotation",
+          "Remove debris",
+          "Monitor regularly"
+        ],
+        "treatmentSteps": [
+          "Identify infected leaves",
+          "Apply appropriate fungicide",
+          "Monitor progress"
+        ],
+        "preventiveGuidelines": [
+          "Plant resistant varieties",
+          "Maintain proper spacing",
+          "Avoid over-fertilization"
+        ]
+      },
+      "cottonVirus": {
+        "description": "A viral disease transmitted by whiteflies causing leaf curling.",
+        "suggestion": "Use resistant varieties and control whitefly population.",
+        "symptoms": [
+          "Leaf curling",
+          "Stunted growth",
+          "Yellowing veins",
+          "Reduced yield"
+        ],
+        "solutions": [
+          "Remove infected plants",
+          "Control whiteflies",
+          "Use resistant varieties"
+        ],
+        "prevention": [
+          "Use certified seeds",
+          "Monitor regularly",
+          "Install yellow sticky traps"
+        ],
+        "treatmentSteps": [
+          "Identify infected plants",
+          "Remove and destroy them",
+          "Apply insecticides"
+        ],
+        "preventiveGuidelines": [
+          "Plant virus-free seeds",
+          "Control whitefly population",
+          "Practice crop rotation"
+        ]
+      }
+    }
+  }
+}
