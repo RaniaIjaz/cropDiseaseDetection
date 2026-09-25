@@ -8,7 +8,7 @@ load_dotenv()
 MONGO_URI = os.getenv("MONGO_URI")
 
 if not MONGO_URI:
-    raise ValueError("❌ MONGO_URI not set in .env file")
+    raise ValueError("MONGO_URI not set in .env file")
 
 # Connect to MongoDB Atlas
 client = AsyncIOMotorClient(MONGO_URI)
@@ -24,4 +24,7 @@ images_collection = db["images"]
 
 
 
-print("✅ Connected to MongoDB:", db.name)
+# Plain ASCII: when stdout is a redirected pipe on Windows it falls back to the
+# cp1252 locale encoding, and a non-ASCII character here raises
+# UnicodeEncodeError at import time — killing the server before it can bind.
+print("[db] Using MongoDB database:", db.name)

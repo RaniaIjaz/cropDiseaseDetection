@@ -1,10 +1,8 @@
 
 
-from fastapi import FastAPI, UploadFile, File, APIRouter, HTTPException,Form
-from tensorflow.keras.models import load_model
-import tensorflow as tf
-from tensorflow.keras.preprocessing import image
-from tensorflow.keras.layers import LeakyReLU
+from fastapi import UploadFile, File, APIRouter, HTTPException
+# tensorflow is imported lazily inside load_model_and_classes() so the module
+# can be imported without it (see model_routes.py for the same treatment).
 import numpy as np
 from PIL import Image
 import io
@@ -12,13 +10,6 @@ import json
 import logging
 from typing import Dict, List, Any
 
-from app.models.reports import ReportBase
-from app.models.images import ImageBase, ImageStatus
-from app.db.mongo import images_collection, reports_collection, diseases_collection
-from app.models.reports import ReportBase
-import io
-import datetime
-import uuid
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -31,10 +22,21 @@ class_indices = None  # Use only one mapping
 wheat_model = None
 
 
+_load_attempted = False
+
+
 def load_model_and_classes():
     """Load model and class information"""
-    global  class_indices, wheat_model
-    
+    global  class_indices, wheat_model, _load_attempted
+
+    # Guards against FastAPI's double invocation of a router startup handler,
+    # which otherwise logged the same missing-file error twice.
+    if _load_attempted:
+        return
+    _load_attempted = True
+
+    from tensorflow.keras.models import load_model
+
     try:
         # Load model
         # cotton_model = load_model("models/disease_detection_model.h5")
@@ -52,13 +54,29 @@ def load_model_and_classes():
         logger.info(f"Loaded {len(class_indices)} classes: {list(class_indices.values())}")
         
     except Exception as e:
+        # Non-fatal: this router's model (xception_best.keras) is optional and
+        # is not what /predict/predict-disease/ uses. Re-raising here aborted
+        # application startup entirely, taking down every other route with it.
+        # The endpoints below report 503 while the model is unavailable.
         logger.error(f"Error loading model or class files: {str(e)}")
-        raise
+
 
 # Load model on startup
 @router.on_event("startup")
 async def startup_event():
     load_model_and_classes()
+
+
+def _require_wheat_model():
+    """Guard for endpoints that cannot work without the optional model."""
+    if wheat_model is None:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "Wheat model unavailable: models/xception_best.keras is missing. "
+                "Use /predict/predict-disease/ instead."
+            ),
+        )
 
 def preprocess_image(img: Image.Image, target_size: tuple = (224, 224)) -> np.ndarray:
     """Preprocess image exactly like during training"""
@@ -101,6 +119,8 @@ async def predict_cotton_disease(file: UploadFile = File(...)):
     """
     Predict wheat disease from leaf image
     """
+    _require_wheat_model()
+
     try:
         # Validate file type
         if not file.content_type.startswith('image/'):
@@ -185,8 +205,8 @@ async def get_classes():
     Get all available disease classes
     """
     return {
-        "classes": class_indices,
-        "total_classes": len(class_indices)
+        "classes": class_indices or {},
+        "total_classes": len(class_indices or {})
     }
 
 @router.get("/wheat-model-health")

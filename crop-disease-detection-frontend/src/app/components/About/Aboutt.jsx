@@ -1,34 +1,49 @@
-
-
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
-import { Leaf, Sprout, AlertTriangle, Brain } from "lucide-react";
+import { Sprout, AlertTriangle, Brain } from "lucide-react";
 import { useTranslations } from "next-intl";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: "easeOut" } },
+};
+
+/** Icon sits above the heading so a wrapped two-line title never leaves it
+ *  dangling mid-air beside the text. */
+const SectionHeading = ({ icon: Icon, iconClass, children, align = "center" }) => (
+  <h2
+    className={`flex flex-col gap-2 text-3xl font-bold text-balance text-brand-800 sm:text-4xl ${
+      align === "center" ? "items-center text-center" : "items-start"
+    }`}
+  >
+    <Icon className={`h-8 w-8 shrink-0 ${iconClass}`} aria-hidden="true" />
+    <span>{children}</span>
+  </h2>
+);
 
 const AboutPage = () => {
   const t = useTranslations("aboutPage");
-
   const problems = t.raw("problems.items") || [];
 
   return (
-    <section className="bg-gradient-to-b from-green-50 to-yellow-50 text-gray-800 overflow-hidden">
-      <section className="relative bg-gradient-to-b from-green-50 to-yellow-50">
-
-        <div 
-          className="absolute inset-0 bg-cover bg-center" 
+    <div className="overflow-hidden bg-white text-gray-800">
+      {/* Hero */}
+      <section className="relative">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: "url('/assets/new.jpeg')" }}
+          aria-hidden="true"
         >
-          <div className="absolute inset-0 bg-black/40"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/45 to-black/60" />
         </div>
 
-
-        <div className="relative z-10 flex flex-col items-center justify-center text-center h-[65vh] px-6 md:px-12">
+        <div className="relative z-10 flex min-h-[26rem] flex-col items-center justify-center px-6 py-20 text-center sm:min-h-[28rem] md:px-12 lg:min-h-[32rem]">
           <motion.h1
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 32 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-            className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white drop-shadow-lg leading-tight"
+            transition={{ duration: 0.8 }}
+            className="max-w-4xl text-3xl leading-tight font-extrabold text-balance text-white drop-shadow-lg sm:text-4xl md:text-5xl lg:text-6xl"
           >
             {t("hero.title")}
           </motion.h1>
@@ -36,111 +51,116 @@ const AboutPage = () => {
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 1 }}
-            className="mt-4 text-lg sm:text-xl md:text-2xl text-gray-200 max-w-2xl"
+            transition={{ delay: 0.25, duration: 0.8 }}
+            className="mt-5 max-w-2xl text-base text-white/90 text-pretty sm:text-lg md:text-xl"
           >
             {t("hero.subtitle")}
           </motion.p>
         </div>
       </section>
 
-
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="max-w-6xl mx-auto px-6 py-20 text-center"
+      {/* Mission */}
+      <motion.section
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.25 }}
+        className="section-y bg-gradient-to-b from-brand-50 to-amber-50/40"
       >
-        <h2 className="text-4xl font-bold text-green-800 mb-4 flex justify-center items-center gap-2">
-          <Sprout className="text-green-600 w-8 h-8" /> {t("mission.title")}
-        </h2>
-        <p className="text-gray-700 leading-relaxed text-lg max-w-6xl mx-auto">
-          {t("mission.description")}
-        </p>
-      </motion.div>
+        <div className="shell max-w-4xl text-center">
+          <SectionHeading icon={Sprout} iconClass="text-brand-600">
+            {t("mission.title")}
+          </SectionHeading>
+          <p className="mt-5 text-base leading-relaxed text-gray-700 text-pretty sm:text-lg">
+            {t("mission.description")}
+          </p>
+        </div>
+      </motion.section>
 
-
-      <div className="py-20 bg-gradient-to-r from-green-100 via-yellow-50 to-green-100">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-center px-6">
-          <div className="w-full h-[400px] md:h-[500px]">
-            <motion.img
-              src="/assets/we.jpg"
-              alt="AI Detection"
-              className="rounded-3xl bg-white shadow-2xl object-cover w-full h-full"
-              initial={{ opacity: 0, x: -60 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1 }}
-              viewport={{ once: true }}
-            />
-          </div>
+      {/* What we do */}
+      <section className="section-y bg-gradient-to-r from-brand-100 via-amber-50 to-brand-100">
+        <div className="shell grid items-center gap-10 md:grid-cols-2 md:gap-12">
+          <motion.img
+            src="/assets/we.jpg"
+            alt=""
+            loading="lazy"
+            className="h-64 w-full rounded-3xl bg-white object-cover shadow-2xl sm:h-80 md:h-[26rem]"
+            initial={{ opacity: 0, x: -48 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true, amount: 0.25 }}
+          />
 
           <motion.div
-            initial={{ opacity: 0, x: 60 }}
+            initial={{ opacity: 0, x: 48 }}
             whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1 }}
-            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true, amount: 0.25 }}
           >
-            <h2 className="text-4xl font-bold text-green-800 mb-4 flex items-center gap-2">
-              <Brain className="text-green-600 w-8 h-8" /> {t("whatWeDo.title")}
-            </h2>
-            <p className="text-gray-700 text-lg leading-relaxed">
+            <SectionHeading icon={Brain} iconClass="text-brand-600" align="start">
+              {t("whatWeDo.title")}
+            </SectionHeading>
+            <p className="mt-5 text-base leading-relaxed text-gray-700 text-pretty sm:text-lg">
               {t("whatWeDo.description")}
             </p>
           </motion.div>
         </div>
-      </div>
+      </section>
 
-      <div className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          <motion.h2
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-4xl font-bold text-green-800 mb-8 flex justify-center items-center gap-2"
+      {/* Problems */}
+      <section className="section-y bg-white">
+        <div className="shell">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
           >
-            <AlertTriangle className="text-yellow-500 w-8 h-8" /> {t("problems.title")}
-          </motion.h2>
+            <SectionHeading icon={AlertTriangle} iconClass="text-gold-500">
+              {t("problems.title")}
+            </SectionHeading>
+          </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {problems.map((problem, index) => (
-              <motion.div
+              <motion.article
                 key={index}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-green-50 hover:bg-green-100 transition p-6 rounded-2xl shadow-md border border-green-100"
+                transition={{ duration: 0.5, delay: Math.min(index, 5) * 0.07 }}
+                viewport={{ once: true, amount: 0.2 }}
+                className="h-full rounded-2xl border border-brand-100 bg-brand-50 p-6 text-center shadow-sm transition-colors hover:bg-brand-100"
               >
-                <h3 className="font-semibold text-green-800 text-xl mb-2">
+                <h3 className="text-lg font-semibold text-balance text-brand-800">
                   {problem.title}
                 </h3>
-                <p className="text-gray-700">{problem.description}</p>
-              </motion.div>
+                <p className="mt-2 text-sm leading-relaxed text-gray-700 text-pretty">
+                  {problem.description}
+                </p>
+              </motion.article>
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
-  
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="py-20 px-6 text-center bg-white"
+      {/* Vision */}
+      <motion.section
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        className="section-y bg-brand-50"
       >
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold text-green-800 mb-4">
+        <div className="shell max-w-3xl text-center">
+          <h2 className="text-3xl font-bold text-balance text-brand-800 sm:text-4xl">
             {t("vision.title")}
           </h2>
-          <p className="text-gray-700 text-lg leading-relaxed">
+          <p className="mt-5 text-base leading-relaxed text-gray-700 text-pretty sm:text-lg">
             {t("vision.description")}
           </p>
         </div>
-      </motion.div>
-    </section>
+      </motion.section>
+    </div>
   );
 };
 

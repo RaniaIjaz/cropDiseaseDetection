@@ -1,9 +1,18 @@
 {
   "navbar": {
     "navItems": [
-      { "href": "/", "label": "Home" },
-      { "href": "/disease-detection", "label": "Disease Detection" },
-      { "href": "/about", "label": "About" }
+      {
+        "href": "/",
+        "label": "Home"
+      },
+      {
+        "href": "/disease-detection",
+        "label": "Disease Detection"
+      },
+      {
+        "href": "/about",
+        "label": "About"
+      }
     ],
     "userDropdown": {
       "history": "History",
@@ -98,9 +107,9 @@
           "icon": "🌍"
         }
       ]
-    }    
+    }
   },
-    "aboutPage": {
+  "aboutPage": {
     "hero": {
       "title": "Empowering Farmers with AI 🌾",
       "subtitle": "Combining Artificial Intelligence with Agriculture to protect crops, increase yield, and ensure food security."
@@ -147,17 +156,19 @@
       "description": "We envision a world where every farmer — whether in remote villages or modern cities — can access AI tools to protect their crops and maximize yield. Our goal is to make agriculture smarter, greener, and more sustainable for generations to come."
     }
   },
-   "detectionPage": {
+  "detectionPage": {
     "title": "Disease Detection",
     "subtitle": "Upload a crop leaf image for instant analysis",
     "cropSelector": {
       "wheat": "Wheat",
-      "cotton": "Cotton"
+      "cotton": "Cotton",
+      "label": "Crop type"
     },
     "uploadSection": {
       "title": "Click to upload or drag and drop",
       "subtitle": "Supports JPG, PNG (Max 10MB)",
-      "button": "Detect Disease"
+      "button": "Detect Disease",
+      "change": "Remove image"
     },
     "loading": {
       "analyzing": "Analyzing...",
@@ -171,7 +182,7 @@
       "treatmentSteps": "Treatment Steps",
       "preventionMeasures": "Prevention Measures",
       "preventiveGuidelines": "Preventive Guidelines",
-       "healthyStatus": "Healthy",
+      "healthyStatus": "Healthy",
       "noSymptoms": "No symptoms detected",
       "noSolutions": "No treatment solutions available",
       "noTreatmentSteps": "No treatment steps available",
@@ -189,9 +200,8 @@
       "invalidImage": "Invalid image! Please upload a {cropType} crop image.",
       "validationFailed": "Image validation failed. Please upload an image containing {cropType} plant, leaves, or field."
     }
-    
   },
-   "historyPage": {
+  "historyPage": {
     "title": "Detection History",
     "welcomeMessage": "Welcome back,",
     "subtitle": "View and analyze your previous plant disease detections",
@@ -202,19 +212,16 @@
     "noTreatmentSuggested": "No specific treatment suggested",
     "notAvailable": "N/A",
     "noDescription": "No description available",
-    
     "stats": {
       "totalDetections": "Total Detections",
       "differentCrops": "Different Crops",
       "diseasesDetected": "Diseases Detected"
     },
-    
     "filters": {
       "title": "Filter Detections",
       "searchPlaceholder": "Search disease...",
       "allDiseases": "All Diseases"
     },
-    
     "summary": {
       "filteredResults": "Filtered Results",
       "active": "Active",
@@ -227,7 +234,6 @@
       "latest": "Latest",
       "lastDetection": "Last detection date"
     },
-    
     "charts": {
       "topDiseases": "Top Diseases",
       "top10": "Top 10",
@@ -236,9 +242,9 @@
       "cropDistribution": "Crop Distribution",
       "byDetectionCount": "By Detection Count",
       "detections": "detections",
-      "count": "Count"
+      "count": "Count",
+      "other": "Other"
     },
-    
     "detections": {
       "title": "Your Detections",
       "showing": "Showing",
@@ -249,14 +255,12 @@
       "detectedOn": "Detected on",
       "viewDetails": "View Details"
     },
-    
     "noDetections": {
       "title": "No detections found",
       "tryAdjusting": "Try adjusting your search or filter criteria",
       "noDetectionsYet": "You haven't made any detections yet. Upload an image to get started!",
       "startDetection": "Start Detection"
     },
-    
     "modal": {
       "loading": "Loading detailed information...",
       "loadError": "Could not load additional details",
@@ -277,12 +281,10 @@
       "description": "Description",
       "copiedAlert": "Details copied to clipboard!"
     },
-    
     "crops": {
       "wheat": "Wheat",
       "cotton": "Cotton"
     },
-    
     "mockData": {
       "wheatRust": {
         "description": "Wheat Leaf Rust is a fungal disease caused by Puccinia triticina.",
@@ -345,5 +347,73 @@
         ]
       }
     }
+  },
+  "footer": {
+    "tagline": "AI-powered wheat and cotton disease detection, built for farmers.",
+    "explore": "Explore",
+    "connect": "Connect",
+    "rights": "All rights reserved."
+  },
+  "auth": {
+    "signup": {
+      "title": "Create Your Account",
+      "subtitle": "Start detecting crop diseases in seconds.",
+      "name": "Full name",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Create Account",
+      "haveAccount": "Already have an account?",
+      "login": "Login",
+      "errors": {
+        "name": "Full name is required.",
+        "email": "Email is required.",
+        "password": "Password is required."
+      },
+      "failed": "Registration failed"
+    },
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Log in to view your detection history.",
+      "email": "Email",
+      "password": "Password",
+      "forgot": "Forgot Password?",
+      "submit": "Login",
+      "noAccount": "Don't have an account?",
+      "signup": "Sign Up",
+      "success": "Login successful",
+      "failed": "Invalid email or password",
+      "fillAll": "Please fill in all fields"
+    },
+    "forgot": {
+      "title": "Forgot Password",
+      "subtitle": "We will email you a one-time code.",
+      "email": "Email",
+      "submit": "Get OTP",
+      "sending": "Sending…",
+      "sent": "OTP sent to your email!",
+      "failed": "Failed to send OTP",
+      "required": "Please enter your email"
+    },
+    "otp": {
+      "title": "Enter OTP Code",
+      "subtitle": "Type the 6-digit code we sent to your inbox.",
+      "submit": "Continue",
+      "incomplete": "Please enter all 6 digits of the OTP",
+      "verified": "OTP verified"
+    },
+    "reset": {
+      "title": "Enter New Password",
+      "subtitle": "Choose a password of at least 8 characters.",
+      "password": "New Password",
+      "submit": "Reset Password",
+      "updating": "Updating…",
+      "expired": "Session expired. Please try again.",
+      "tooShort": "Password must be at least 8 characters",
+      "success": "Password reset successfully!",
+      "failed": "Failed to reset password"
+    },
+    "close": "Close",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   }
 }

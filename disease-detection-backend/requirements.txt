@@ -1,6 +1,9 @@
 fastapi==0.115.4  #FastAPI is a modern, fast (high-performance) Python web framework for building APIs.
 uvicorn[standard]==0.32.0
-pydantic[email]==2.9.2 #for data validation and schema creation
+pydantic[email]==2.10.6 #for data validation and schema creation
+# 2.9.2 was unsatisfiable: fastapi-mail 1.5.0 requires pydantic>=2.10.1,
+# so a clean `pip install -r requirements.txt` failed to resolve. FastAPI
+# 0.115.4 accepts >=1.7.4,<3, so bumping pydantic satisfies both.
 python-dotenv==1.0.1
 motor==3.6.0
 bcrypt==4.2.1

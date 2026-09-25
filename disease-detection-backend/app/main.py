@@ -4,12 +4,6 @@ from app.routes.model_routes import router as model_router
 from app.routes.wheat_routes import router as wheat_router
 from app.routes.reports_routes import router as reports_router
 from fastapi.middleware.cors import CORSMiddleware
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
-from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
-from PIL import Image
-import numpy as np
-import io
 from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(title="FastAPI Auth System with MongoDB")
