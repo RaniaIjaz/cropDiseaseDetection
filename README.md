@@ -10,9 +10,13 @@ A full-stack final-year project for detecting wheat and cotton diseases from lea
 
 ### Diagnosis
 
-Upload a leaf image and get the disease, a description, symptoms, treatment solutions and step-by-step treatment, plus prevention guidance.
+Pick the crop, upload a leaf image, and run detection. The image is checked with CLIP first, so a photo that is not the selected crop is rejected before it reaches the model.
 
-![Detection result](docs/screenshots/03-detection-result.png)
+![Uploading a leaf image for detection](docs/screenshots/03a-upload.png)
+
+The result gives the disease and a description, then symptoms, treatment solutions and step-by-step treatment, followed by prevention measures and preventive guidelines.
+
+![Detection result](docs/screenshots/03b-result.png)
 
 ### Detection history
 
