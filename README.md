@@ -1,6 +1,38 @@
 # Crop Disease Detection System
 
+[![CI](https://github.com/RaniaIjaz/cropDiseaseDetection/actions/workflows/ci.yml/badge.svg)](https://github.com/RaniaIjaz/cropDiseaseDetection/actions/workflows/ci.yml)
+
 A full-stack final-year project for detecting wheat and cotton diseases from leaf images. The system combines trained deep-learning models with a bilingual web application, user authentication, prediction history, and report management.
+
+![Home page](docs/screenshots/01-home-en.jpg)
+
+## Screenshots
+
+### Diagnosis
+
+Upload a leaf image and get the disease, a description, symptoms, treatment solutions and step-by-step treatment, plus prevention guidance.
+
+![Detection result](docs/screenshots/03-detection-result.png)
+
+### Detection history
+
+Every prediction is stored and charted: top diseases, a daily timeline, and the split between crops.
+
+![Detection history and charts](docs/screenshots/04-history-charts.png)
+
+### How it works
+
+![How it works](docs/screenshots/02-how-it-works.png)
+
+### Bilingual — English and Urdu
+
+The Urdu locale is fully right-to-left, with the layout mirrored and a Nastaliq typeface.
+
+![Urdu interface](docs/screenshots/05-urdu-home.jpg)
+
+### Responsive
+
+<img src="docs/screenshots/06-mobile-home.jpg" alt="Mobile layout" width="320">
 
 ## Highlights
 
