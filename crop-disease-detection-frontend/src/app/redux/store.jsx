@@ -1,6 +1,6 @@
 
 
-// import userSlice from "./Slices/userSlice";
+// import userSlice from "./slices/userSlice";
 // import { configureStore } from "@reduxjs/toolkit";
 // import { combineReducers, createStore } from "redux";
 // import {
@@ -38,7 +38,7 @@
 
 "use client";
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import userSlice from "./Slices/userSlice";
+import userSlice from "./slices/userSlice";
 import {
   persistReducer,
   persistStore,

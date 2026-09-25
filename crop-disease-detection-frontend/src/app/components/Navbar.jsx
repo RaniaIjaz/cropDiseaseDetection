@@ -1,39 +1,55 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { GiHamburgerMenu } from "react-icons/gi";
-import { GrClose } from "react-icons/gr";
-import { FaGlobe } from "react-icons/fa";
-import { usePathname } from "next/navigation";
-import SignUp from "../components/Signup";
-import Login from "./Login/Login";
+import { Menu, X, Globe, ChevronDown, Check } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../redux/Slices/userSlice";
-import { useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
+import SignUp from "./Signup";
+import Login from "./Login/Login";
+import { logout } from "../redux/slices/userSlice";
+
+const LOCALES = [
+  { code: "en", labelKey: "language.english" },
+  { code: "ur", labelKey: "language.urdu" },
+];
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
-  const pathname = usePathname();
-  const dispatch = useDispatch();
-  const { isLogin, user } = useSelector((state) => state.user);
-  const router = useRouter();
   const [showDropdown, setShowDropdown] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("");
 
-  // Get translations and current locale
+  const pathname = usePathname();
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const { isLogin, user } = useSelector((state) => state.user);
+  const menuButtonRef = useRef(null);
+
   const t = useTranslations("navbar");
   const navItems = t.raw("navItems") || [];
   const currentLocale = useLocale();
+
+  // Path with the `/en` | `/ur` prefix removed, used for both active-state
+  // matching and for language switching.
+  const pathWithoutLocale = pathname.replace(/^\/(en|ur)(?=\/|$)/, "") || "/";
+
+  const isActive = (href) =>
+    href === "/" ? pathWithoutLocale === "/" : pathWithoutLocale.startsWith(href);
 
   const handleLogout = () => {
     dispatch(logout());
     setShowDropdown(false);
     setIsMobileMenuOpen(false);
     router.push(`/${currentLocale}/`);
+  };
+
+  const goToHistory = () => {
+    setShowDropdown(false);
+    setIsMobileMenuOpen(false);
+    router.push(`/${currentLocale}/history`);
   };
 
   const openModal = (type) => {
@@ -47,318 +63,318 @@ const Navbar = () => {
     setModalType("");
   };
 
-  // Handle language change
   const handleLanguageChange = (locale) => {
     setShowLanguageDropdown(false);
-    // Get current path without locale
-    const pathWithoutLocale = pathname.replace(/^\/(en|ur)/, "") || "/";
-    
-    // Navigate to the new locale
-    if (locale === "en") {
-      router.push(`/en${pathWithoutLocale}`);
-    } else {
-      router.push(`/ur${pathWithoutLocale}`);
-    }
+    setIsMobileMenuOpen(false);
+    router.push(`/${locale}${pathWithoutLocale === "/" ? "" : pathWithoutLocale}`);
   };
 
-  // Close mobile menu when clicking outside
+  // A single outside-click/Escape handler for all three popovers.
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (isMobileMenuOpen && !event.target.closest(".mobile-menu-container")) {
-        setIsMobileMenuOpen(false);
+    const handlePointerDown = (event) => {
+      if (!event.target.closest(".js-popover")) {
         setShowLanguageDropdown(false);
-      }
-      if (showLanguageDropdown && !event.target.closest(".language-dropdown-container")) {
-        setShowLanguageDropdown(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isMobileMenuOpen, showLanguageDropdown]);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (showDropdown && !event.target.closest(".dropdown-container")) {
         setShowDropdown(false);
       }
+      if (isMobileMenuOpen && !event.target.closest(".js-mobile-menu")) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    const handleKeyDown = (event) => {
+      if (event.key !== "Escape") return;
+      setShowLanguageDropdown(false);
+      setShowDropdown(false);
+      if (isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+        menuButtonRef.current?.focus();
+      }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showDropdown]);
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isMobileMenuOpen]);
+
+  // Navigating away (including via the browser back button) should never leave
+  // the drawer hanging open over the new page.
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+    setShowDropdown(false);
+    setShowLanguageDropdown(false);
+  }, [pathname]);
+
+  const activeLocale = LOCALES.find((l) => l.code === currentLocale) ?? LOCALES[0];
 
   return (
     <>
-      <nav className="bg-white sticky py-2 top-0 z-40 border-b-4 sm:border-b-[20px] xl:border-b-[1.5vw] border-b-[#3d9970] shadow-sm">
-        <div className="max-w-7xl xl:max-w-none mx-auto px-4 sm:px-6 lg:px-8 2xl:px-[1vw]">
-          <div className="flex items-center justify-between h-14 sm:h-16 xl:h-[12vh]">
-            {/* Logo */}
-            <div className="flex items-center flex-shrink-0">
-              <Link href={`/${currentLocale}`} className="flex items-center">
-                <div className="relative w-[50px] h-[50px] sm:w-[55px] sm:h-[55px] xl:w-[6vw] xl:h-[7vw]">
-                  <Image
-                    src="/assets/logo3.png"
-                    alt="Logo"
-                    fill
-                    className="object-contain"
-                    priority
-                  />
-                </div>
+      <header className="sticky top-0 z-40 border-b border-brand-100 bg-white/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/80">
+        <nav className="shell flex h-16 items-center justify-between gap-4 lg:h-20">
+          {/* Logo */}
+          <Link
+            href={`/${currentLocale}`}
+            className="flex shrink-0 items-center"
+            aria-label="AgriDoctor home"
+          >
+            <span className="relative block h-11 w-11 sm:h-12 sm:w-12 lg:h-14 lg:w-14">
+              <Image
+                src="/assets/logo3.png"
+                alt="AgriDoctor"
+                fill
+                sizes="56px"
+                className="object-contain"
+                priority
+              />
+            </span>
+          </Link>
+
+          {/* Desktop navigation */}
+          <div className="hidden items-center gap-1 md:flex lg:gap-2">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={`/${currentLocale}${item.href === "/" ? "" : item.href}`}
+                aria-current={isActive(item.href) ? "page" : undefined}
+                className={`rounded-lg px-3 py-2 text-sm font-semibold whitespace-nowrap transition-colors lg:text-base ${
+                  isActive(item.href)
+                    ? "bg-brand-50 text-brand-600"
+                    : "text-ink hover:bg-gray-50 hover:text-brand-600"
+                }`}
+              >
+                {item.label}
               </Link>
-            </div>
+            ))}
+          </div>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex md:space-x-[3vw] items-center">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={`/${currentLocale}${item.href}`}
-                  className={`${
-                    pathname.includes(item.href) ? "text-[#3d9970]" : "text-[#151515]"
-                  } text-sm md:text-[1.3vw] font-semibold hover:text-[#FFB300] transition-colors duration-200 whitespace-nowrap`}
+          {/* Desktop right-hand controls */}
+          <div className="hidden items-center gap-2 md:flex">
+            {/* Language switcher */}
+            <div className="js-popover relative">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLanguageDropdown((v) => !v);
+                  setShowDropdown(false);
+                }}
+                aria-haspopup="menu"
+                aria-expanded={showLanguageDropdown}
+                aria-label={t("language.label")}
+                className="flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+              >
+                <Globe className="h-4 w-4 text-gray-500" aria-hidden="true" />
+                <span className="hidden lg:inline">{t(activeLocale.labelKey)}</span>
+                <span className="lg:hidden">{activeLocale.code.toUpperCase()}</span>
+                <ChevronDown
+                  className={`h-3.5 w-3.5 text-gray-400 transition-transform ${
+                    showLanguageDropdown ? "rotate-180" : ""
+                  }`}
+                  aria-hidden="true"
+                />
+              </button>
+
+              {showLanguageDropdown && (
+                <ul
+                  role="menu"
+                  className="absolute end-0 top-full z-50 mt-2 w-44 overflow-hidden rounded-xl border border-gray-200 bg-white py-1 shadow-xl"
                 >
-                  {item.label}
-                </Link>
-              ))}
-              
-              {/* Language Switcher - Desktop */}
-              <div className="relative language-dropdown-container ml-4">
-                <button
-                  onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
-                >
-                  <FaGlobe className="h-5 w-5 text-gray-600" />
-                  <span className="text-sm font-medium text-gray-700">
-                    {currentLocale === "en" ? t("language.english") : t("language.urdu")}
-                  </span>
-                </button>
-                
-                {showLanguageDropdown && (
-                  <div className="absolute top-full right-0 mt-2 w-40 bg-white rounded-xl shadow-xl z-50 border border-gray-200 overflow-hidden">
-                    <div className="py-1">
+                  {LOCALES.map((l) => (
+                    <li key={l.code}>
                       <button
-                        onClick={() => handleLanguageChange("en")}
-                        className={`w-full px-4 py-3 text-left text-sm hover:bg-gray-100 transition-colors duration-200 ${
-                          currentLocale === "en" 
-                            ? "bg-[#f4fdf9] text-[#3d9970] font-semibold" 
+                        type="button"
+                        role="menuitem"
+                        onClick={() => handleLanguageChange(l.code)}
+                        className={`flex w-full cursor-pointer items-center justify-between gap-2 px-4 py-2.5 text-start text-sm transition-colors hover:bg-gray-50 ${
+                          currentLocale === l.code
+                            ? "bg-brand-50 font-semibold text-brand-600"
                             : "text-gray-700"
                         }`}
                       >
-                        🇺🇸 {t("language.english")}
+                        <span>{t(l.labelKey)}</span>
+                        {currentLocale === l.code && (
+                          <Check className="h-4 w-4 shrink-0" aria-hidden="true" />
+                        )}
                       </button>
-                      <button
-                        onClick={() => handleLanguageChange("ur")}
-                        className={`w-full px-4 py-3 text-left text-sm hover:bg-gray-100 transition-colors duration-200 ${
-                          currentLocale === "ur" 
-                            ? "bg-[#f4fdf9] text-[#3d9970] font-semibold" 
-                            : "text-gray-700"
-                        }`}
-                      >
-                        🇵🇰 {t("language.urdu")}
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Desktop Right Section */}
-            <div className="hidden sm:flex items-center space-x-2 md:space-x-[0.8vw]">
-              {isLogin ? (
-                <div className="relative dropdown-container">
-                  <button
-                    onClick={() => setShowDropdown(!showDropdown)}
-                    className="flex cursor-pointer items-center space-x-2 p-2 xl:p-[0.6vw] border xl:rounded-[1vw] rounded-lg border-[#2BDF88] hover:bg-gray-100 transition-colors duration-200"
-                  >
-                    <div className="w-7 h-7 md:h-[5vh] md:w-[5vh] overflow-hidden rounded-full ">
-                      <Image
-                        src="/assets/profileImage.png"
-                        alt="User Profile"
-                        width={32}
-                        height={32}
-                        className="object-cover w-full h-full"
-                      />
-                    </div>
-                    <span className="hidden lg:block text-[#151515] text-sm md:text-[1.3vw] max-w-[100px] md:max-w-none truncate">
-                      {user?.userName || "User"}
-                    </span>
-                  </button>
-
-                  {showDropdown && (
-                    <div className="absolute top-full right-0 mt-2 w-48 xl:w-[12vw] bg-white rounded-xl xl:rounded-[1.1vw] shadow-xl z-50 border border-gray-200 overflow-hidden">
-                      <div className="py-1">
-                        <button
-                         onClick={() => router.push(`/${currentLocale}/history`)}
-                          className="w-full px-4 py-3 xl:py-[1vw] xl:px-[1.5vw] text-left text-gray-700 text-sm xl:text-[1.2vw] hover:bg-[#f4fdf9] hover:text-[#2BDF88] transition-colors duration-200"
-                        >
-                          {t("userDropdown.history")}
-                        </button>
-
-                        <button
-                          onClick={handleLogout}
-                          className="w-full px-4 py-3 xl:py-[1vw] xl:px-[1.5vw] text-left text-gray-700 text-sm xl:text-[1.2vw] hover:bg-[#fff4f4] hover:text-red-500 transition-colors duration-200"
-                        >
-                          {t("userDropdown.logout")}
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <button
-                  onClick={() => openModal("signup")}
-                  className="bg-[#3d9970] px-3 py-2 xl:px-[1vw] xl:py-[1vw] text-sm xl:text-[1.3vw] xl:rounded-[1vw] rounded-lg text-white font-bold hover:bg-[#25c778] active:scale-95 transition-all duration-200 whitespace-nowrap"
-                >
-                  {t("authButton")}
-                </button>
+                    </li>
+                  ))}
+                </ul>
               )}
             </div>
 
-            {/* Mobile Menu Button */}
-            <div className="flex items-center sm:hidden mobile-menu-container">
-              {/* Language Switcher - Mobile (icon only) */}
-              <div className="relative language-dropdown-container mr-4">
+            {isLogin ? (
+              <div className="js-popover relative">
                 <button
-                  onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
-                  className="p-2 text-gray-600 hover:text-gray-800 transition-colors duration-200"
+                  type="button"
+                  onClick={() => {
+                    setShowDropdown((v) => !v);
+                    setShowLanguageDropdown(false);
+                  }}
+                  aria-haspopup="menu"
+                  aria-expanded={showDropdown}
+                  className="flex cursor-pointer items-center gap-2 rounded-xl border border-brand-200 py-1.5 ps-1.5 pe-3 transition-colors hover:bg-brand-50"
                 >
-                  <FaGlobe className="h-5 w-5" />
+                  <span className="relative block h-8 w-8 shrink-0 overflow-hidden rounded-full bg-brand-100">
+                    <Image
+                      src="/assets/profileImage.png"
+                      alt=""
+                      fill
+                      sizes="32px"
+                      className="object-cover"
+                    />
+                  </span>
+                  <span className="max-w-[9rem] truncate text-sm font-medium text-ink">
+                    {user?.userName || "User"}
+                  </span>
+                  <ChevronDown
+                    className={`h-3.5 w-3.5 shrink-0 text-gray-400 transition-transform ${
+                      showDropdown ? "rotate-180" : ""
+                    }`}
+                    aria-hidden="true"
+                  />
                 </button>
-                
-                {showLanguageDropdown && (
-                  <div className="absolute top-full right-0 mt-2 w-40 bg-white rounded-xl shadow-xl z-50 border border-gray-200 overflow-hidden">
-                    <div className="py-1">
+
+                {showDropdown && (
+                  <ul
+                    role="menu"
+                    className="absolute end-0 top-full z-50 mt-2 w-48 overflow-hidden rounded-xl border border-gray-200 bg-white py-1 shadow-xl"
+                  >
+                    <li>
                       <button
-                        onClick={() => handleLanguageChange("en")}
-                        className={`w-full px-4 py-3 text-left text-sm hover:bg-gray-100 transition-colors duration-200 ${
-                          currentLocale === "en" 
-                            ? "bg-[#f4fdf9] text-[#3d9970] font-semibold" 
-                            : "text-gray-700"
-                        }`}
+                        type="button"
+                        role="menuitem"
+                        onClick={goToHistory}
+                        className="w-full cursor-pointer px-4 py-2.5 text-start text-sm text-gray-700 transition-colors hover:bg-brand-50 hover:text-brand-600"
                       >
-                        🇺🇸 {t("language.english")}
+                        {t("userDropdown.history")}
                       </button>
+                    </li>
+                    <li>
                       <button
-                        onClick={() => handleLanguageChange("ur")}
-                        className={`w-full px-4 py-3 text-left text-sm hover:bg-gray-100 transition-colors duration-200 ${
-                          currentLocale === "ur" 
-                            ? "bg-[#f4fdf9] text-[#3d9970] font-semibold" 
-                            : "text-gray-700"
-                        }`}
+                        type="button"
+                        role="menuitem"
+                        onClick={handleLogout}
+                        className="w-full cursor-pointer px-4 py-2.5 text-start text-sm text-gray-700 transition-colors hover:bg-red-50 hover:text-red-600"
                       >
-                        🇵🇰 {t("language.urdu")}
+                        {t("userDropdown.logout")}
                       </button>
-                    </div>
-                  </div>
+                    </li>
+                  </ul>
                 )}
               </div>
-              
+            ) : (
               <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 text-[#2BDF88] hover:text-gray-700 focus:outline-none transition-colors duration-200"
+                type="button"
+                onClick={() => openModal("signup")}
+                className="cursor-pointer rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-bold whitespace-nowrap text-white shadow-sm transition-all hover:bg-brand-600 active:scale-95 lg:text-base"
               >
-                {isMobileMenuOpen ? (
-                  <GrClose className="h-6 w-6" />
-                ) : (
-                  <GiHamburgerMenu className="h-6 w-6 text-black" />
-                )}
+                {t("authButton")}
               </button>
-            </div>
+            )}
           </div>
-        </div>
 
-        {/* Mobile Menu */}
+          {/* Mobile trigger — `md` so it hands over to the desktop bar at the
+              exact width the desktop links appear. The old sm/md split left
+              640–767px with no navigation at all. */}
+          <button
+            ref={menuButtonRef}
+            type="button"
+            onClick={() => setIsMobileMenuOpen((v) => !v)}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-menu"
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+            className="js-mobile-menu -me-2 cursor-pointer rounded-lg p-2.5 text-ink transition-colors hover:bg-gray-100 md:hidden"
+          >
+            {isMobileMenuOpen ? (
+              <X className="h-6 w-6" aria-hidden="true" />
+            ) : (
+              <Menu className="h-6 w-6" aria-hidden="true" />
+            )}
+          </button>
+        </nav>
+
+        {/* Mobile menu */}
         {isMobileMenuOpen && (
-          <div className="sm:hidden mobile-menu-container">
-            <div className="px-4 pt-2 pb-4 space-y-1 bg-white border-t border-gray-200 shadow-lg">
-              {/* Navigation Links */}
+          <div
+            id="mobile-menu"
+            className="js-mobile-menu max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-gray-200 bg-white shadow-lg md:hidden"
+          >
+            <div className="shell space-y-1 py-3">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
-                  href={`/${currentLocale}${item.href}`}
+                  href={`/${currentLocale}${item.href === "/" ? "" : item.href}`}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`block px-3 py-3 text-base font-medium transition-colors duration-200 ${
-                    pathname.includes(item.href)
-                      ? "text-[#2BDF88] bg-[#f4fdf9]"
-                      : "text-[#151515] hover:text-[#2BDF88] hover:bg-gray-50"
+                  aria-current={isActive(item.href) ? "page" : undefined}
+                  className={`block rounded-lg px-3 py-3 text-base font-medium transition-colors ${
+                    isActive(item.href)
+                      ? "bg-brand-50 text-brand-600"
+                      : "text-ink hover:bg-gray-50"
                   }`}
                 >
                   {item.label}
                 </Link>
               ))}
-              
-              {/* Language Options in Mobile Menu */}
-              <div className="pt-4 border-t border-gray-200">
-                <div className="px-3 py-2 text-sm font-medium text-gray-500 mb-2">
+
+              <div className="border-t border-gray-200 pt-3">
+                <p className="px-3 pb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
                   {t("language.label")}
-                </div>
+                </p>
                 <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => {
-                      handleLanguageChange("en");
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
-                      currentLocale === "en"
-                        ? "bg-[#3d9970] text-white"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                  >
-                    🇺🇸 {t("language.english")}
-                  </button>
-                  <button
-                    onClick={() => {
-                      handleLanguageChange("ur");
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
-                      currentLocale === "ur"
-                        ? "bg-[#3d9970] text-white"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                  >
-                    🇵🇰 {t("language.urdu")}
-                  </button>
+                  {LOCALES.map((l) => (
+                    <button
+                      key={l.code}
+                      type="button"
+                      onClick={() => handleLanguageChange(l.code)}
+                      className={`cursor-pointer rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                        currentLocale === l.code
+                          ? "bg-brand-500 text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      {t(l.labelKey)}
+                    </button>
+                  ))}
                 </div>
               </div>
-              
-              <div className="pt-4 border-t border-gray-200 space-y-3">
+
+              <div className="space-y-2 border-t border-gray-200 pt-3">
                 {isLogin ? (
                   <>
-                    <div className="flex items-center px-3 py-2 bg-gray-50 rounded-lg">
-                      <div className="w-8 h-8 overflow-hidden rounded-full mr-3">
+                    <div className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2.5">
+                      <span className="relative block h-9 w-9 shrink-0 overflow-hidden rounded-full bg-brand-100">
                         <Image
                           src="/assets/profileImage.png"
-                          alt="User Profile"
-                          width={32}
-                          height={32}
-                          className="object-cover w-full h-full"
+                          alt=""
+                          fill
+                          sizes="36px"
+                          className="object-cover"
                         />
-                      </div>
-                      <span className="text-sm font-medium text-gray-700">
+                      </span>
+                      <span className="truncate text-sm font-semibold text-gray-800">
                         {user?.userName || "User"}
                       </span>
                     </div>
                     <button
-                      onClick={() => router.push(`/${locale}/history`)}
-                          className="w-full px-4 py-3 xl:py-[1vw] xl:px-[1.5vw] text-left text-gray-700 text-sm xl:text-[1.2vw] hover:bg-[#f4fdf9] hover:text-[#2BDF88] transition-colors duration-200"
-                        >
-                          {t("userDropdown.history")}
-                        </button>
-
+                      type="button"
+                      onClick={goToHistory}
+                      className="w-full cursor-pointer rounded-lg px-3 py-3 text-start text-base font-medium text-ink transition-colors hover:bg-brand-50 hover:text-brand-600"
+                    >
+                      {t("userDropdown.history")}
+                    </button>
                     <button
+                      type="button"
                       onClick={handleLogout}
-                      className="w-full px-3 py-2 text-left text-red-500 hover:text-red-600 transition-colors duration-200 font-medium"
+                      className="w-full cursor-pointer rounded-lg px-3 py-3 text-start text-base font-medium text-red-600 transition-colors hover:bg-red-50"
                     >
                       {t("mobileMenu.logout")}
                     </button>
                   </>
                 ) : (
                   <button
+                    type="button"
                     onClick={() => openModal("signup")}
-                    className="w-full bg-[#2BDF88] px-4 py-3 text-base rounded-lg text-white font-bold hover:bg-[#25c778] transition-colors duration-200"
+                    className="w-full cursor-pointer rounded-xl bg-brand-500 px-4 py-3 text-base font-bold text-white transition-colors hover:bg-brand-600"
                   >
                     {t("authButton")}
                   </button>
@@ -367,22 +383,17 @@ const Navbar = () => {
             </div>
           </div>
         )}
-      </nav>
 
-      {/* Modals */}
+        {/* Brand accent rule. The old 20px / 1.5vw border ate up to 29px of
+            vertical space on wide screens. */}
+        <div aria-hidden="true" className="h-1 w-full bg-brand-500 sm:h-1.5" />
+      </header>
+
       {isModalOpen && modalType === "signup" && (
-        <SignUp
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          toggleModal={openModal}
-        />
+        <SignUp isOpen onClose={closeModal} toggleModal={openModal} />
       )}
       {isModalOpen && modalType === "login" && (
-        <Login
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          toggleModal={openModal}
-        />
+        <Login isOpen onClose={closeModal} toggleModal={openModal} />
       )}
     </>
   );

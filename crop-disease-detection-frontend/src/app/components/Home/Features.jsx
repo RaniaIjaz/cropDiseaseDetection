@@ -1,91 +1,42 @@
-// "use client";
-// import { motion } from "framer-motion";
-
-// const features = [
-//   {
-//     title: "Fast & Accurate",
-//     desc: "AI detection in seconds with high precision.",
-//     icon: "⚡",
-//   },
-//   {
-//     title: "Crop Support",
-//     desc: "Specialized for Wheat & Cotton farmers.",
-//     icon: "🌾",
-//   },
-//   {
-//     title: "Solution Suggestions",
-//     desc: "Actionable tips to cure and prevent diseases.",
-//     icon: "💡",
-//   },
-//   {
-//     title: "Web Based",
-//     desc: "Access from anywhere, on any device.",
-//     icon: "🌍",
-//   },
-// ];
-
-// export default function Features() {
-//   return (
-//     <section className="bg-gray-50 py-20 px-6 text-center">
-//       <h2 className="text-4xl font-bold text-[#3d9970]">Features</h2>
-
-//       <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-//         {features.map((feature, i) => (
-//           <motion.div
-//             key={i}
-//             initial={{ opacity: 0, y: 40 }}
-//             whileInView={{ opacity: 1, y: 0 }}
-//             viewport={{ once: true }}
-//             transition={{ duration: 0.6, delay: i * 0.2 }}
-//             className="bg-white shadow-lg rounded-2xl p-8 hover:shadow-2xl transform hover:-translate-y-2 transition duration-300"
-//           >
-//             <div className="text-5xl mb-4">{feature.icon}</div>
-//             <h3 className="text-xl font-semibold text-[#2F5F48]">
-//               {feature.title}
-//             </h3>
-//             <p className="mt-3 text-gray-600">{feature.desc}</p>
-//           </motion.div>
-//         ))}
-//       </div>
-//     </section>
-//   );
-// }
-
-
-
 "use client";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 
 export default function Features() {
   const t = useTranslations("home.features");
-  
-  // Get features array from translations
   const features = t.raw("items") || [];
 
   return (
-    <section className="bg-gray-50 pb-20 px-6 text-center">
-      <h2 className="text-4xl font-bold text-[#3d9970]">
-        {t("title")}
-      </h2>
+    <section className="section-y bg-gray-50">
+      <div className="shell">
+        <h2 className="text-center text-3xl font-bold text-brand-500 sm:text-4xl">
+          {t("title")}
+        </h2>
 
-      <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-        {features.map((feature, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: i * 0.2 }}
-            className="bg-white shadow-lg rounded-2xl p-8 hover:shadow-2xl transform hover:-translate-y-2 transition duration-300"
-          >
-            <div className="text-5xl mb-4">{feature.icon}</div>
-            <h3 className="text-xl font-semibold text-[#2F5F48]">
-              {feature.title}
-            </h3>
-            <p className="mt-3 text-gray-600">{feature.description}</p>
-          </motion.div>
-        ))}
+        <div className="mt-10 grid gap-6 sm:mt-12 sm:grid-cols-2 lg:grid-cols-4">
+          {features.map((feature, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.45, delay: Math.min(i, 3) * 0.08 }}
+              /* `h-full` inside a grid cell makes every card match the tallest
+                 one in its row, so the ragged card bottoms are gone. */
+              className="flex h-full flex-col items-center rounded-2xl bg-white p-7 text-center shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:shadow-card-hover"
+            >
+              <div aria-hidden="true" className="text-4xl sm:text-5xl">
+                {feature.icon}
+              </div>
+              <h3 className="mt-4 text-lg font-semibold text-balance text-brand-800">
+                {feature.title}
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink-muted text-pretty">
+                {feature.description}
+              </p>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );

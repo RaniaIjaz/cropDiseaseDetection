@@ -1,332 +1,116 @@
 "use client";
 import axios from "axios";
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
+import { useTranslations, useLocale } from "next-intl";
+import toast from "react-hot-toast";
 import { setUser } from "../redux/slices/userSlice";
+import AuthShell from "./Login/AuthShell";
+import AuthField, { authSubmitClass } from "./Login/AuthField";
 
-import { Eye, EyeOff } from "lucide-react";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function SignUp({ isOpen, onClose, toggleModal }) {
-  const modalRef = useRef(null);
   const router = useRouter();
   const dispatch = useDispatch();
+  const t = useTranslations("auth.signup");
+  const locale = useLocale();
 
   const [formData, setFormData] = useState({
     userName: "",
     email: "",
     password: "",
   });
-
   const [formSubmitted, setFormSubmitted] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
- };
-//   const handleSubmit = async (e) => {
-//   e.preventDefault();
-//   setFormSubmitted(true);
+  };
 
-//   const { userName, email, password } = formData;
-//   if (!userName || !email || !password) return;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setFormSubmitted(true);
 
-//   try {
-//     const res = await axios.post("http://localhost:8000/auth/register", {
-//       userName,
-//       email,
-//       password,
-//     });
+    const { userName, email, password } = formData;
+    if (!userName || !email || !password) return;
 
-//     const { access_token, id, userName: name, email: userEmail } = res.data;
-//     dispatch(setUser({ id, userName: name, email: userEmail, token: access_token }));
+    setLoading(true);
+    try {
+      const res = await axios.post(`${API_BASE_URL}/auth/register`, {
+        userName,
+        email,
+        password,
+      });
 
-//     console.log("User registered & logged in:", res.data);
+      const data = res.data ?? {};
+      dispatch(
+        setUser({
+          id: data.id || data.data?.id || data.userId || "",
+          userName: data.userName || data.name || data.data?.userName || userName,
+          email: data.email || data.data?.email || email,
+          token: data.access_token || data.token || data.data?.access_token || "",
+        })
+      );
 
-//     onClose();
-//     router.push("/");
-//   } catch (error) {
-//     console.error("Error during registration:", error);
-//     alert(error.response?.data?.detail || "Registration failed");
-//   }
-// };
-
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setFormSubmitted(true);
-
-  const { userName, email, password } = formData;
-  if (!userName || !email || !password) return;
-
-  try {
-    const res = await axios.post("http://localhost:8000/auth/register", {
-      userName,
-      email,
-      password,
-    });
-
-    // Debug the response
-    console.log("RAW RESPONSE:", res.data);
-
-    // Extract data safely with fallbacks
-    const responseData = res.data;
-    
-    // Handle different possible response structures
-    const token = responseData.access_token || responseData.token || responseData.data?.access_token || "";
-    const id = responseData.id || responseData.data?.id || responseData.userId || "";
-    const responseUserName = responseData.userName || responseData.name || responseData.data?.userName || userName;
-    const responseEmail = responseData.email || responseData.data?.email || email;
-
-    console.log("Extracted data:", { token, id, responseUserName, responseEmail });
-
-    dispatch(setUser({ 
-      id, 
-      userName: responseUserName, 
-      email: responseEmail, 
-      token 
-    }));
-
-    onClose();
-    router.push("/");
-  } catch (error) {
-    console.error("Error during registration:", error);
-    alert(error.response?.data?.detail || "Registration failed");
-  }
-};
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+      onClose();
+      router.push(`/${locale}`);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || t("failed"));
+    } finally {
+      setLoading(false);
     }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen, onClose]);
-
-  useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "auto";
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [isOpen]);
+  };
 
   if (!isOpen) return null;
 
-  // return (
-  //   <div className="fixed inset-0 bg-black/50 backdrop-blur-md z-50 flex items-center justify-center p-4">
-  //     <div
-  //       ref={modalRef}
-  //       className="bg-white rounded-[20px] p-8 w-full max-w-md shadow-lg"
-  //     >
-  //       <h2 className="text-2xl font-semibold text-center mb-6">
-  //         Create Your Account
-  //       </h2>
+  return (
+    <AuthShell title={t("title")} subtitle={t("subtitle")} onClose={onClose}>
+      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+        <AuthField
+          label={t("name")}
+          name="userName"
+          value={formData.userName}
+          onChange={handleChange}
+          autoComplete="name"
+          error={formSubmitted && !formData.userName ? t("errors.name") : ""}
+        />
+        <AuthField
+          label={t("email")}
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          autoComplete="email"
+          error={formSubmitted && !formData.email ? t("errors.email") : ""}
+        />
+        <AuthField
+          label={t("password")}
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={handleChange}
+          autoComplete="new-password"
+          error={formSubmitted && !formData.password ? t("errors.password") : ""}
+        />
 
-  //       <form onSubmit={handleSubmit} className="space-y-4">
-  //         {/* Name */}
-  //         <div>
-  //           <input
-  //             type="text"
-  //             name="userName"
-  //             value={formData.userName}
-  //             onChange={handleChange}
-  //             placeholder="Full name"
-  //             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-  //           />
-  //           {!formData.userName && formSubmitted && (
-  //             <p className="text-red-500 text-sm mt-1">
-  //               Full Name is required.
-  //             </p>
-  //           )}
-  //         </div>
+        <button type="submit" disabled={loading} className={authSubmitClass}>
+          {t("submit")}
+        </button>
 
-  //         {/* Email */}
-  //         <div>
-  //           <input
-  //             type="email"
-  //             name="email"
-  //             value={formData.email}
-  //             onChange={handleChange}
-  //             placeholder="Email"
-  //             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-  //           />
-  //           {!formData.email && formSubmitted && (
-  //             <p className="text-red-500 text-sm mt-1">Email is required.</p>
-  //           )}
-  //         </div>
-
-  //         {/* Password */}
-  //         <div className="relative">
-  //           <input
-  //             type={showPassword ? "text" : "password"}
-  //             name="password"
-  //             value={formData.password}
-  //             onChange={handleChange}
-  //             placeholder="Password"
-  //             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-  //           />
-  //           <button
-  //             type="button"
-  //             onClick={() => setShowPassword(!showPassword)}
-  //             className="absolute right-3 top-2.5 text-gray-600"
-  //           >
-  //             {showPassword ? <Eye /> : <EyeOff />}
-  //           </button>
-  //           {!formData.password && formSubmitted && (
-  //             <p className="text-red-500 text-sm mt-1">
-  //               Password is required.
-  //             </p>
-  //           )}
-  //         </div>
-
-  //         {/* Submit Button */}
-  //         <button
-  //           type="submit"
-  //           className="w-full py-2 text-white bg-green-500 hover:bg-green-600 rounded-lg font-medium transition duration-300"
-  //         >
-  //           Create Account
-  //         </button>
-
-  //         {/* Login link */}
-  //         <div className="text-center text-sm text-gray-600 mt-4">
-  //           Already have an account?{" "}
-  //           <button
-  //             type="button"
-  //             onClick={() => toggleModal("login")}
-  //             className="text-green-500 hover:underline"
-  //           >
-  //             Login
-  //           </button>
-  //         </div>
-  //       </form>
-  //     </div>
-  //   </div>
-  // );
-
-    return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-md z-50 flex items-center justify-center ">
-      <div
-        ref={modalRef}
-        className="bg-white rounded-[20px] overflow-hidden shadow-lg flex w-full max-w-4xl 2xl:w-full"
-      >
-        {/* <div className="w-[56%] py-8 pl-8 hidden md:block">
-          <img
-            src="/assets/auth.png" 
-            alt="Signup Illustration"
-            className="h-full w-full object-cover rounded-[20px]"
-          />
-        </div> */}
-
-        <div className="w-[56%] py-8 pl-8 hidden md:block">
-  <div className="relative h-full w-full rounded-[20px] overflow-hidden">
-    {/* Image */}
-    <img
-      src="/assets/auth.png"
-      alt="Signup Illustration"
-      className="h-full w-full object-cover"
-    />
-
-    {/* Blackish gradient overlay */}
-    <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent rounded-[20px]" />
-  </div>
-</div>
-
-
-
-        <div className="w-full md:w-[44%] p-10 flex flex-col justify-center">
-          <h2 className="text-2xl font-semibold text-center mb-6">
-            Create Your Account
-          </h2>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-          
-            <div>
-              <input
-                type="text"
-                name="userName"
-                value={formData.userName}
-                onChange={handleChange}
-                placeholder="Full name"
-                 className="w-full px-4 py-2 border border-green-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-              {!formData.userName && formSubmitted && (
-                <p className="text-red-500 text-sm mt-1">
-                  Full Name is required.
-                </p>
-              )}
-            </div>
-
-            {/* Email */}
-            <div>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Email"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-              {!formData.email && formSubmitted && (
-                <p className="text-red-500 text-sm mt-1">Email is required.</p>
-              )}
-            </div>
-
-            {/* Password */}
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Password"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2.5 text-gray-600"
-              >
-                {showPassword ? <Eye /> : <EyeOff />}
-              </button>
-              {!formData.password && formSubmitted && (
-                <p className="text-red-500 text-sm mt-1">
-                  Password is required.
-                </p>
-              )}
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="w-full py-2 text-white bg-green-500 hover:bg-green-600 rounded-lg font-medium transition duration-300"
-            >
-              Create Account
-            </button>
-
-            {/* Login link */}
-            <div className="text-center text-sm text-gray-600 mt-4">
-              Already have an account?{" "}
-              <button
-                type="button"
-                onClick={() => toggleModal("login")}
-                className="text-green-500 hover:underline"
-              >
-                Login
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+        <p className="text-center text-sm text-gray-600">
+          {t("haveAccount")}{" "}
+          <button
+            type="button"
+            onClick={() => toggleModal("login")}
+            className="cursor-pointer font-semibold text-brand-600 hover:underline"
+          >
+            {t("login")}
+          </button>
+        </p>
+      </form>
+    </AuthShell>
   );
-
 }
