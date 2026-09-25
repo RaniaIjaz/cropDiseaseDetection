@@ -2,7 +2,6 @@
 from fastapi import APIRouter, HTTPException
 from bson import ObjectId
 from collections import Counter
-from typing import List, Dict
 from app.models.reports import ReportOut
 from app.db.mongo import reports_collection, images_collection
 
@@ -51,6 +50,10 @@ async def get_report_by_id(report_id: str):
         if not report_doc:
             raise HTTPException(status_code=404, detail="Report not found")
         return await report_helper(report_doc)
+    except HTTPException:
+        # The 404 above is deliberate; the blanket handler below was catching it
+        # and re-reporting a missing report as a 500 server error.
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch report: {str(e)}")
 

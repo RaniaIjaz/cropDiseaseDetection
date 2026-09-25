@@ -1,6 +1,3 @@
-from pydantic import HttpUrl
-from typing import List, Optional
-from uuid import uuid4
 
 
 # cotton_diseases_data = [
@@ -778,11 +775,7 @@ from uuid import uuid4
 
 
 
-import asyncio
-from datetime import datetime
-from motor.motor_asyncio import AsyncIOMotorClient
 import logging
-from typing import List, Dict
 from enum import Enum
 
 logging.basicConfig(level=logging.INFO)

@@ -1,12 +1,10 @@
 
 
-from fastapi import FastAPI, UploadFile, File, APIRouter, HTTPException,Form
-from transformers import CLIPProcessor, CLIPModel
-import torch
-from tensorflow.keras.models import load_model
-import tensorflow as tf
-from tensorflow.keras.preprocessing import image
-from tensorflow.keras.layers import LeakyReLU
+from fastapi import UploadFile, File, APIRouter, HTTPException,Form
+# tensorflow / torch / transformers are imported lazily inside the loader
+# functions below. They are only needed once a model is actually loaded, and
+# keeping them off the module's import path lets the app (and its tests) be
+# imported in an environment where those very large packages are absent.
 import numpy as np
 from PIL import Image
 
@@ -15,15 +13,13 @@ import json
 import logging
 from typing import Dict, List, Any
 from dotenv import load_dotenv
-from google import genai
-from google.genai import types
-import base64
+# `google.genai` is currently unused at runtime (the client construction below
+# is commented out). Importing it eagerly forced the dependency on anything
+# that merely imports this module, so it is left out until it is needed again.
 from app.models.reports import ReportBase,ReportStatus
 from app.models.images import ImageBase, ImageStatus
 from app.db.mongo import images_collection, reports_collection, diseases_collection
-from app.models.reports import ReportBase
-import io,os
-import datetime
+import os
 import uuid
 
 load_dotenv()
@@ -59,10 +55,23 @@ clip_processor = None
 def load_model_and_classes():
     """Load model and class information"""
     global cotton_model, class_indices, wheat_model, wheat_class_indices, cotton_model2
-    
+
+    # FastAPI's merged_lifespan invokes an included router's on_event("startup")
+    # handler more than once, which loaded both .keras files twice.
+    if cotton_model is not None and wheat_model is not None:
+        logger.debug("Models already loaded; skipping reload")
+        return
+
+    from tensorflow.keras.models import load_model
+
     try:
         # Load model
         cotton_model = load_model("models/disease_detection.keras") #disease_detection_model.h5
+        # /predict/predict-disease/ reads `cotton_model2`, which was declared but
+        # never assigned — every cotton request failed with
+        # "'NoneType' object has no attribute 'predict'". Same weights, same
+        # preprocess_image() pipeline and same class_indices as /predict/cotton/.
+        cotton_model2 = cotton_model
         logger.info("Model loaded successfully")
         
         wheat_model = load_model("models/fine_tuned_best_model.keras")
@@ -78,8 +87,23 @@ def load_model_and_classes():
             
         
             
-        logger.info(f"Loaded {len(class_indices)} classes: {list(class_indices.values())}")
-        logger.info(f"Loaded {len(class_indices)} classes: {list(class_indices.values())}")
+        # The second line previously repeated the cotton mapping verbatim, so a
+        # bad wheat mapping would never have shown up in the logs.
+        logger.info(f"Loaded {len(class_indices)} cotton classes: {list(class_indices.values())}")
+        logger.info(f"Loaded {len(wheat_class_indices)} wheat classes: {list(wheat_class_indices.values())}")
+
+        # Fail loudly if a label file and its model disagree: a silent mismatch
+        # returns a confident, wrongly-named disease rather than an error.
+        for name, model, mapping in (
+            ("cotton", cotton_model, class_indices),
+            ("wheat", wheat_model, wheat_class_indices),
+        ):
+            outputs = model.output_shape[-1]
+            if outputs != len(mapping):
+                raise ValueError(
+                    f"{name} model outputs {outputs} classes but its label file "
+                    f"has {len(mapping)} entries"
+                )
         
     except Exception as e:
         logger.error(f"Error loading model or class files: {str(e)}")
@@ -89,7 +113,14 @@ def load_model_and_classes():
 def load_clip_model():
     """Load CLIP model for zero-cost image validation"""
     global clip_model, clip_processor
-    
+
+    # Same double-invocation guard; CLIP is by far the heaviest of the three.
+    if clip_model is not None and clip_processor is not None:
+        logger.debug("CLIP model already loaded; skipping reload")
+        return
+
+    from transformers import CLIPProcessor, CLIPModel
+
     try:
         clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
         clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
@@ -182,10 +213,12 @@ async def is_valid_crop_image(img_bytes: bytes, cropType: str) -> bool:
     """
     Use free CLIP model to validate crop images locally (no API costs)
     """
+    import torch
+
     try:
         # Open image
         img = Image.open(io.BytesIO(img_bytes))
-        
+
         # Define text prompts
         positive_texts = [
             f"a photo of {cropType} plant",

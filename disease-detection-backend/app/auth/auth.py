@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException
 from app.models.users import UserCreate, UserLogin, UserOut, Token,UserToken
 from app.db.mongo import users_collection
 from app.utils.utils import hash_password, verify_password, create_access_token, decode_access_token
