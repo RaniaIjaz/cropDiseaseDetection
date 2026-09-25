@@ -1,0 +1,30 @@
+# Test + lint environment.
+#
+# Deliberately EXCLUDES tensorflow, torch, transformers and google-genai: those
+# are multi-gigabyte, and the suite mocks every model it needs. The application
+# imports them lazily (inside the loader functions), so `app.main` imports fine
+# without them.
+#
+# Versions here mirror requirements.txt exactly so CI tests the same stack
+# production runs.
+
+# --- runtime deps needed to import and exercise the app ---
+fastapi==0.115.4
+uvicorn[standard]==0.32.0
+pydantic[email]==2.10.6
+python-dotenv==1.0.1
+motor==3.6.0
+bcrypt==4.2.1
+passlib[bcrypt]==1.7.4
+PyJWT==2.10.1
+python-multipart==0.0.20
+fastapi-mail==1.5.0
+numpy==2.3.5
+Pillow==12.0.0
+
+# --- test + lint tooling ---
+pytest==8.3.4
+pytest-asyncio==0.25.2
+httpx==0.27.2
+mongomock-motor==0.0.34
+ruff==0.8.6

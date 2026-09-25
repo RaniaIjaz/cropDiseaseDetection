@@ -1,0 +1,30 @@
+# Minimal config: this is an existing codebase, so the rule set is kept narrow
+# enough to be actionable rather than a wall of pre-existing noise.
+
+line-length = 100
+target-version = "py311"
+
+exclude = [
+    "venv",
+    ".venv",
+    "__pycache__",
+    "models",
+    "uploads",
+]
+
+[lint]
+select = [
+    "E9",  # syntax / IO errors
+    "F",   # pyflakes: undefined names, unused imports
+    "B",   # bugbear: likely bugs
+]
+ignore = [
+    "E501",  # line length is reported by the formatter, not worth failing CI over
+    "B008",  # FastAPI's Depends()/File()/Form() defaults are the documented idiom
+    "B904",  # `raise ... from err` inside except: stylistic, and applying it
+             # across the existing ML error handlers is churn without benefit
+]
+
+[lint.per-file-ignores]
+# Tests deliberately import fixtures for their side effects and shadow names.
+"tests/*" = ["F811", "F401"]
