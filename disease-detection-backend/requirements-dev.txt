@@ -20,7 +20,7 @@ PyJWT==2.10.1
 python-multipart==0.0.20
 fastapi-mail==1.5.0
 numpy==2.3.5
-Pillow==12.0.0
+Pillow==11.3.0
 
 # --- test + lint tooling ---
 pytest==8.3.4

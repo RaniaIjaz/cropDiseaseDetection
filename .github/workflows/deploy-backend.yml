@@ -1,7 +1,7 @@
 name: Deploy backend to Hugging Face Space
 
-# Publishes disease-detection-backend/ to a Hugging Face Docker Space whenever
-# it changes on main. One-time setup (repo Settings -> Secrets and variables -> Actions):
+# Publishes disease-detection-backend/ to a Hugging Face Gradio Space (ZeroGPU,
+# the free option) whenever it changes on main. One-time setup (repo Settings -> Secrets and variables -> Actions):
 #   secret   HF_TOKEN  - a Hugging Face access token with "write" permission
 #   variable HF_SPACE  - the Space id, e.g. "your-hf-username/agridoctor-api"
 # Until both are set, the job is skipped.
@@ -45,7 +45,7 @@ jobs:
               repo_type="space",
               folder_path="disease-detection-backend",
               ignore_patterns=[".env", ".env.*", "tests/*", "uploads/*", "**/__pycache__/*", "venv/*", ".venv*/*"],
-              delete_patterns=["app/**", "models/**"],
+              delete_patterns=["app/**", "models/**", "Dockerfile", ".dockerignore"],
               commit_message=f"Deploy {os.environ.get('GITHUB_SHA', '')[:7]} from GitHub",
           )
           print("Uploaded to https://huggingface.co/spaces/" + os.environ["HF_SPACE"])

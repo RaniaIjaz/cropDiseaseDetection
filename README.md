@@ -149,8 +149,10 @@ Never commit the real `.env` file. It is ignored by Git.
 
 ## Deploy (free tier)
 
-The frontend runs on **Vercel**, the backend on a **Hugging Face Docker Space** (the free CPU tier has 16 GB RAM,
-enough for TensorFlow, PyTorch and CLIP), and the data on **MongoDB Atlas** (free M0 cluster).
+The frontend runs on **Vercel**, the backend on a **Hugging Face Gradio Space** with **ZeroGPU** hardware (the only
+Space type a free Hugging Face account can run; Docker and CPU Spaces need a paid plan), and the data on
+**MongoDB Atlas** (free M0 cluster). `disease-detection-backend/space_app.py` serves the FastAPI app inside the Gradio
+Space; the models and CLIP run on the Space's CPU, so the ZeroGPU daily GPU quota is not used.
 
 ### 1. Database: MongoDB Atlas
 
@@ -161,8 +163,8 @@ enough for TensorFlow, PyTorch and CLIP), and the data on **MongoDB Atlas** (fre
 
 ### 2. Backend: Hugging Face Space
 
-1. On huggingface.co create a new **Space** → SDK **Docker** → **Blank**, hardware **CPU basic (free)**,
-   e.g. `your-hf-username/agridoctor-api`.
+1. On huggingface.co create a new **Space** → SDK **Gradio** → **Blank**, hardware **ZeroGPU**,
+   e.g. `your-hf-username/agridoctor-api`. (Free accounts can have up to 2 ZeroGPU Spaces.)
 2. In the Space's **Settings → Variables and secrets**, add as secrets: `MONGO_URI`, `JWT_SECRET`, `MAIL_USERNAME`,
    `MAIL_PASSWORD`, `MAIL_FROM`; and as variables: `JWT_ALGORITHM=HS256`, `MAIL_PORT=587`,
    `MAIL_SERVER=smtp.gmail.com`, `BASE_URL=https://your-hf-username-agridoctor-api.hf.space`,
