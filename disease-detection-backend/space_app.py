@@ -41,7 +41,25 @@ with gr.Blocks(title="AgriDoctor API") as status_page:
 # API routes are registered first, so they take precedence over this mount.
 app = gr.mount_gradio_app(api, status_page, path="/")
 
+def report_startup_to_zerogpu() -> None:
+    """Tell ZeroGPU that this app has a @spaces.GPU function.
+
+    The `spaces` package normally sends this report from inside
+    `gradio.Blocks.launch()`. This app never calls `launch()` (it serves the
+    FastAPI app through uvicorn instead), so the report has to be sent by hand,
+    or the platform stops the Space with:
+        "No @spaces.GPU function detected during startup"
+    Off ZeroGPU, `spaces.zero.startup` does not exist and there is nothing to do.
+    """
+    try:
+        from spaces.zero import startup  # pyright: ignore[reportAttributeAccessIssue]
+    except ImportError:
+        return
+    startup()
+
+
 if __name__ == "__main__":
+    report_startup_to_zerogpu()
     # Gradio Spaces route traffic to GRADIO_SERVER_PORT (7860). Do not use $PORT:
     # on ZeroGPU it is set to 7861, which the Space's own runtime already occupies.
     port = int(os.getenv("GRADIO_SERVER_PORT", "7860"))
