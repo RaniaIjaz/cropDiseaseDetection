@@ -1,0 +1,52 @@
+name: Deploy backend to Hugging Face Space
+
+# Publishes disease-detection-backend/ to a Hugging Face Docker Space whenever
+# it changes on main. One-time setup (repo Settings -> Secrets and variables -> Actions):
+#   secret   HF_TOKEN  - a Hugging Face access token with "write" permission
+#   variable HF_SPACE  - the Space id, e.g. "your-hf-username/agridoctor-api"
+# Until both are set, the job is skipped.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "disease-detection-backend/**"
+      - ".github/workflows/deploy-backend.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-backend
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ vars.HF_SPACE != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Upload backend folder to the Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE: ${{ vars.HF_SPACE }}
+        run: |
+          pip install --quiet "huggingface_hub>=0.25"
+          python - <<'EOF'
+          import os
+          from huggingface_hub import HfApi
+          api = HfApi(token=os.environ["HF_TOKEN"])
+          # Large .keras files are stored with Git LFS automatically.
+          api.upload_folder(
+              repo_id=os.environ["HF_SPACE"],
+              repo_type="space",
+              folder_path="disease-detection-backend",
+              ignore_patterns=[".env", ".env.*", "tests/*", "uploads/*", "**/__pycache__/*", "venv/*", ".venv*/*"],
+              delete_patterns=["app/**", "models/**"],
+              commit_message=f"Deploy {os.environ.get('GITHUB_SHA', '')[:7]} from GitHub",
+          )
+          print("Uploaded to https://huggingface.co/spaces/" + os.environ["HF_SPACE"])
+          EOF
