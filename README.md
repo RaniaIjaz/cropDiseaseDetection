@@ -140,8 +140,50 @@ Create `disease-detection-backend/.env` from the committed `.env.example` file.
 | `MAIL_FROM` | Sender address for password-reset messages |
 | `MAIL_PORT` | SMTP port; defaults to `587` |
 | `MAIL_SERVER` | SMTP host; defaults to `smtp.gmail.com` |
+| `ALLOWED_ORIGINS` | Deployed frontend URL(s) allowed by CORS, comma-separated |
+| `ALLOWED_ORIGIN_REGEX` | Optional CORS regex, e.g. `https://.*\.vercel\.app` for preview deployments |
+
+The frontend reads `NEXT_PUBLIC_API_URL` (defaults to `http://localhost:8000`).
 
 Never commit the real `.env` file. It is ignored by Git.
+
+## Deploy (free tier)
+
+The frontend runs on **Vercel**, the backend on a **Hugging Face Docker Space** (the free CPU tier has 16 GB RAM,
+enough for TensorFlow, PyTorch and CLIP), and the data on **MongoDB Atlas** (free M0 cluster).
+
+### 1. Database: MongoDB Atlas
+
+1. Create a free M0 cluster, a database user, and allow network access from `0.0.0.0/0`.
+2. Copy the connection string (`mongodb+srv://...`); this is `MONGO_URI`.
+3. Load the disease information once, from your machine, with that URI in `disease-detection-backend/.env`:
+   `cd disease-detection-backend && python upload_to_mongo.py`
+
+### 2. Backend: Hugging Face Space
+
+1. On huggingface.co create a new **Space** → SDK **Docker** → **Blank**, hardware **CPU basic (free)**,
+   e.g. `your-hf-username/agridoctor-api`.
+2. In the Space's **Settings → Variables and secrets**, add as secrets: `MONGO_URI`, `JWT_SECRET`, `MAIL_USERNAME`,
+   `MAIL_PASSWORD`, `MAIL_FROM`; and as variables: `JWT_ALGORITHM=HS256`, `MAIL_PORT=587`,
+   `MAIL_SERVER=smtp.gmail.com`, `BASE_URL=https://your-hf-username-agridoctor-api.hf.space`,
+   `ALLOWED_ORIGINS=https://your-app.vercel.app` (fill in after step 3).
+3. Create a Hugging Face access token with **write** permission (Settings → Access Tokens).
+4. In this GitHub repo, **Settings → Secrets and variables → Actions**: add secret `HF_TOKEN` (the token) and
+   variable `HF_SPACE` (`your-hf-username/agridoctor-api`).
+5. Run **Actions → Deploy backend to Hugging Face Space → Run workflow**. Later pushes to `main` that touch the
+   backend redeploy automatically. The first build takes several minutes; the API is then live at
+   `https://your-hf-username-agridoctor-api.hf.space/docs`.
+
+### 3. Frontend: Vercel
+
+1. On vercel.com, **Add New → Project** and import this repository.
+2. Set **Root Directory** to `crop-disease-detection-frontend` (framework: Next.js).
+3. Add the environment variable `NEXT_PUBLIC_API_URL=https://your-hf-username-agridoctor-api.hf.space`, then deploy.
+4. Put the resulting `https://….vercel.app` address into the Space's `ALLOWED_ORIGINS` variable and restart the Space.
+
+**Free-tier notes:** a Space sleeps after about 48 hours without traffic and takes a minute or two to wake up
+(the first request after sleeping is slow). Uploaded images are stored on the Space's disk, which is reset on
+restart, so older report images can disappear; the reports themselves stay in MongoDB.
 
 ## Main API routes
 
