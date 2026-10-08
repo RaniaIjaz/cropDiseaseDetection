@@ -136,21 +136,31 @@ async def startup_event():
     load_model_and_classes()
     load_clip_model()
 
-def preprocess_image(img: Image.Image, target_size: tuple = (224, 224)) -> np.ndarray:
-    """Preprocess image exactly like during training"""
+def preprocess_image(img: Image.Image, target_size: tuple = (224, 224), crop_type: str = "cotton") -> np.ndarray:
+    """Preprocess image exactly like during training.
+
+    The two models were trained with different pixel scaling:
+    - cotton (disease_detection.keras): ImageDataGenerator(rescale=1./255) -> [0, 1]
+    - wheat (fine_tuned_best_model.keras): mobilenet_v2.preprocess_input -> [-1, 1]
+    Neither model contains a preprocessing layer, so the scaling must match here.
+    """
     # Convert to RGB if necessary
     if img.mode != 'RGB':
         img = img.convert('RGB')
-    
+
     # Resize to target size
     img = img.resize(target_size)
-    
-    # Convert to array and normalize (same as training)
+
     img_array = np.array(img)
     img_array = np.expand_dims(img_array, axis=0)
-    img_array = img_array.astype('float32') / 255.0
-    
-    return img_array
+    img_array = img_array.astype('float32')
+
+    if crop_type.lower() == "wheat":
+        # Same as tf.keras.applications.mobilenet_v2.preprocess_input (x / 127.5 - 1),
+        # written out so TensorFlow is not needed at import time.
+        return img_array / 127.5 - 1.0
+
+    return img_array / 255.0
 
 def get_top_predictions(predictions: np.ndarray, top_k: int = 3) -> List[Dict[str, Any]]:
     """Get top K predictions with confidence scores"""
@@ -318,8 +328,8 @@ async def predict_disease(
         
         # Open and preprocess image
         img = Image.open(io.BytesIO(img_bytes))
-        processed_image = preprocess_image(img)
-        
+        processed_image = preprocess_image(img, crop_type=cropType)
+
         if cropType == "cotton":
             return await _process_cotton_prediction(userId, file, img_bytes, processed_image, locale)
         else:  # wheat
