@@ -42,4 +42,7 @@ with gr.Blocks(title="AgriDoctor API") as status_page:
 app = gr.mount_gradio_app(api, status_page, path="/")
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", "7860")))
+    # Gradio Spaces route traffic to GRADIO_SERVER_PORT (7860). Do not use $PORT:
+    # on ZeroGPU it is set to 7861, which the Space's own runtime already occupies.
+    port = int(os.getenv("GRADIO_SERVER_PORT", "7860"))
+    uvicorn.run(app, host="0.0.0.0", port=port)
