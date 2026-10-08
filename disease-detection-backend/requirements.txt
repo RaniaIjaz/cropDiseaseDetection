@@ -12,10 +12,13 @@ PyJWT==2.10.1
 python-multipart==0.0.20
 fastapi-mail==1.5.0
 numpy==2.3.5
-Pillow==12.0.0
+Pillow==11.3.0  # gradio 5 (Hugging Face Space) requires pillow<12
 tensorflow==2.20.0
 torch==2.9.1
 transformers==4.57.3
 google-genai==1.54.0
 
 
+# Hugging Face Gradio Space (ZeroGPU); keep gradio equal to sdk_version in README.md
+gradio==5.49.1
+spaces==0.51.3
